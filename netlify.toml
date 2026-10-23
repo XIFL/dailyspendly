@@ -1,0 +1,7 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Bypass the app login on Deploy Previews only (see src/App.jsx and netlify/functions/entries.mts)
+[context.deploy-preview.environment]
+  VITE_PREVIEW_AUTH_BYPASS = "true"

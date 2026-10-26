@@ -8,6 +8,14 @@ const CATEGORIES = ["Food", "Transportation", "Housing", "Entertainment", "Shopp
 const PAYMENT_METHODS = ["Cash", "Debit", "Credit"];
 const PRIORITIES = ["Need", "Want"];
 
+// True only for real calendar dates in YYYY-MM-DD form (rejects e.g. 2026-13-45 or 2026-02-30).
+function isValidDate(value: unknown): value is string {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const [y, m, d] = value.split("-").map(Number);
+  const parsed = new Date(Date.UTC(y, m - 1, d));
+  return parsed.getUTCFullYear() === y && parsed.getUTCMonth() === m - 1 && parsed.getUTCDate() === d;
+}
+
 type Row = typeof entries.$inferSelect;
 const toEntry = (r: Row) => ({
   id: r.id,
@@ -40,8 +48,7 @@ export default async (req: Request, context: Context) => {
     const amount = Number(body?.amount);
     const notes = typeof body?.notes === "string" ? body.notes.trim().slice(0, 250) : "";
     if (
-      typeof body?.date !== "string" ||
-      !/^\d{4}-\d{2}-\d{2}$/.test(body.date) ||
+      !isValidDate(body?.date) ||
       !CATEGORIES.includes(body.category) ||
       !PAYMENT_METHODS.includes(body.payment) ||
       !PRIORITIES.includes(body.priority) ||

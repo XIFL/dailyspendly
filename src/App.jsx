@@ -16,7 +16,8 @@ import { todayLocal, isWithinPeriod } from "@/lib/dates";
 
 function createEmptyForm(){return{date:todayLocal(),category:"",payment:"",amount:"",priority:"",notes:""}}
 let authCallbackPromise;
-// Deploy Previews only: VITE_PREVIEW_AUTH_BYPASS is set in netlify.toml for the deploy-preview context.
+// Deploy Previews: VITE_PREVIEW_AUTH_BYPASS is set in netlify.toml for the deploy-preview context.
+// Local testing: set VITE_PREVIEW_AUTH_BYPASS=true (and LOCAL_AUTH_BYPASS=true for the API) in your shell before `netlify dev`.
 const PREVIEW_BYPASS=import.meta.env.VITE_PREVIEW_AUTH_BYPASS==="true";
 const PREVIEW_USER={id:"preview-test-user",email:"preview@test"};
 export default function App(){

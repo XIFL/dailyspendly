@@ -28,10 +28,15 @@ const toEntry = (r: Row) => ({
 });
 
 export default async (req: Request, context: Context) => {
+  // Netlify Identity doesn't run under `netlify dev`, so for local testing only: when the function runs in the
+  // local "dev" context AND LOCAL_AUTH_BYPASS=true is set in the developer's shell, use a shared test user.
+  // This can never be active in a deployed context (production, branch deploys or previews).
+  const localBypass = context.deploy.context === "dev" && process.env.LOCAL_AUTH_BYPASS === "true";
   // On Deploy Previews only, fall back to a shared test user so login can be bypassed for testing.
-  const user =
-    (await getUser()) ??
-    (context.deploy.context === "deploy-preview" ? { id: "preview-test-user" } : null);
+  const user = localBypass
+    ? { id: "local-test-user" }
+    : (await getUser()) ??
+      (context.deploy.context === "deploy-preview" ? { id: "preview-test-user" } : null);
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   if (req.method === "GET") {
